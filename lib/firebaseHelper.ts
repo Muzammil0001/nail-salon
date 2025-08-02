@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 
-const serviceAccount = require("../JulietNailsFirebaseAdminSDK.json");
+const serviceAccount = {};
 
 const app =
   !admin.apps.length
