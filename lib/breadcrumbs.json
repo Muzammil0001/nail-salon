@@ -1,0 +1,340 @@
+{
+  "/admin/customers": {
+    "title": "customers",
+    "content": "appointment_customers",
+    "icon": ""
+  },
+  "/admin/user-services": {
+    "title": "user_services",
+    "content": "manage_user_services",
+    "icon": ""
+  },
+  "/admin/loyalty": {
+    "title": "loyalty",
+    "content": "manage_loyalty",
+    "icon": ""
+  },
+ "/admin/payroll": {
+    "title": "payroll",
+    "content": "manage_payroll",
+    "icon": "CalculateIcon"
+  },
+  "/admin/benefits/gift-cards": {
+    "title": "Gift Cards",
+    "content": "manage_gift_cards",
+    "icon": "CalculateIcon"
+  },
+  "/admin/benefits/loyalty-program": {
+    "title": "Loyalty Program",
+    "content": "manage_loyalty_program",
+    "icon": "CalculateIcon"
+  },
+  "/admin/turn-tracker": {
+    "title": "turn_tracker",
+    "content": "turn_tracker_overview",
+    "icon": ""
+  },
+  "/admin/sites": {
+    "title": "sites",
+    "content": "sites_overview",
+    "icon": "company"
+  },
+  "/admin/sites/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_site",
+        "content": "sites_add_site",
+        "icon": "company"
+      },
+      "action=view": {
+        "title": "edit_site",
+        "content": "sites_edit_site",
+        "icon": "company"
+      }
+    }
+  },
+  "/admin/clients": {
+    "title": "client",
+    "content": "client_overview",
+    "icon": "person"
+  },
+  "/admin/clients/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_client",
+        "content": "client_add_client",
+        "icon": "person"
+      },
+      "action=view": {
+        "title": "edit_client",
+        "content": "client_edit_client",
+        "icon": "person"
+      }
+    }
+  },
+  "/admin/locations-overview": {
+    "title": "locations",
+    "content": "location_overview",
+    "icon": "location"
+  },
+  "/admin/locations-overview/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_location",
+        "content": "location_add_location",
+        "icon": "location"
+      },
+      "action=view": {
+        "title": "edit_location",
+        "content": "location_edit_location",
+        "icon": "location"
+      }
+    }
+  },
+  "/admin/dashboard": {
+    "title": "dashboard",
+    "content": "dashboard_overview",
+    "icon": "dashboard"
+  },
+  "/admin/appointments": {
+    "title": "appointments",
+    "content": "appointments_overview",
+    "icon": "CalculateIcon"
+  },
+  "/admin/appointments/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_appointment",
+        "content": "branch_appointments_add_appointment",
+        "icon": "CalculateIcon"
+      },
+      "action=edit": {
+        "title": "edit_appointment",
+        "content": "branch_appointments_edit_appointment",
+        "icon": "CalculateIcon"
+      }
+    }
+  },
+  "/admin/app-translation": {
+    "title": "translations",
+    "content": "translations_overview",
+    "icon": "language"
+  },
+  "/admin/app-translation/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_translation",
+        "content": "translation_add_translation",
+        "icon": "language"
+      },
+      "action=view": {
+        "title": "edit_translation",
+        "content": "translation_edit_translation",
+        "icon": "language"
+      }
+    }
+  },
+  "/admin/activerequests": {
+    "title": "Active Requests",
+    "content": "Call staff/ Active Requests",
+    "icon": "company"
+  },
+  "/admin/categories": {
+    "title": "categories",
+    "content": "categories",
+    "icon": "menu"
+  },
+  "/admin/categories/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_category",
+        "content": "categories_add_category",
+        "icon": "menu"
+      },
+      "action=view": {
+        "title": "edit_category",
+        "content": "categories_edit_category",
+        "icon": "menu"
+      }
+    }
+  },
+  "/admin/services": {
+    "title": "services",
+    "content": "services",
+    "icon": "menu"
+  },
+  "/admin/services/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_service",
+        "content": "services_add_service",
+        "icon": "menu"
+      },
+      "action=view": {
+        "title": "edit_service",
+        "content": "services_edit_service",
+        "icon": "menu"
+      }
+    }
+  },
+  "/admin/staffapp": {
+    "title": "staff_app_settings",
+    "content": "app_settings_staff_settings",
+    "icon": "menu"
+  },
+  "/admin/users": {
+    "title": "users",
+    "content": "my_salon_users",
+    "icon": "person"
+  },
+  "/admin/users/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_users",
+        "content": "my_salon_users_add_users",
+        "icon": "person"
+      },
+      "action=view": {
+        "title": "edit_users",
+        "content": "my_salon_users_edit_users",
+        "icon": "person"
+      }
+    }
+  },
+  "/admin/roles": {
+    "title": "roles",
+    "content": "roles_overview",
+    "icon": "IconUserPin"
+  },
+  "/admin/all_user": {
+    "title": "users",
+    "content": "myorbypos_alluser",
+    "icon": "person"
+  },
+  "/admin/configuration": {
+    "title": "configuration",
+    "content": "_configuration_overview",
+    "icon": "IconSettingsCog"
+  },
+  "/admin/appversions": {
+    "title": "app_versions",
+    "content": "app_versions_overview",
+    "icon": "IconVersions"
+  },
+  "/admin/appversions/manage": {
+    "title": "app_versions",
+    "queries": {
+      "action=create": {
+        "title": "app_versions",
+        "content": "app_version_add_version",
+        "icon": "IconVersions"
+      },
+      "action=view": {
+        "title": "app_versions",
+        "content": "app_version_edit_version",
+        "icon": "IconVersions"
+      }
+    }
+  },
+  "/admin/subscriptionNavigation": {
+    "title": "Subscription",
+    "content": " / Subscription / Overview",
+    "icon": "CardMembershipIcon"
+  },
+  "/admin/devices": {
+    "title": "devices",
+    "content": "devices_overview",
+    "icon": "menu"
+  },
+  "/admin/devices/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_device",
+        "content": "devices_add_device",
+        "icon": "menu"
+      },
+      "action=view": {
+        "title": "edit_device",
+        "content": "devices_edit_device",
+        "icon": "menu"
+      }
+    }
+  },
+  "/admin/announcements": {
+    "title": "announcement",
+    "content": "announcement_overview",
+    "icon": "IconSpeakerphone"
+  },
+  "/admin/announcements/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_announcement",
+        "content": "announcement_add_announcement",
+        "icon": "IconSpeakerphone"
+      },
+      "action=view": {
+        "title": "edit_announcement",
+        "content": "announcement_edit_announcement",
+        "icon": "IconSpeakerphone"
+      }
+    }
+  },
+  "/admin/plans": {
+    "title": "plans",
+    "content": "my_salon_plans",
+    "icon": "person"
+  },
+  "/admin/subscription": {
+    "title": "subscription",
+    "content": "subscription_overview",
+    "icon": "IconBusinessplan"
+  },
+  "/admin/receipts": {
+    "title": "receipts",
+    "content": "location_receipts",
+    "icon": "company"
+  },
+  "/admin/receipts/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_receipt",
+        "content": "location_receipts_add_receipt",
+        "icon": "company"
+      },
+      "action=edit": {
+        "title": "edit_receipt",
+        "content": "location_receipts_edit_receipt",
+        "icon": "company"
+      },
+      "action=view": {
+        "title": "view_receipt",
+        "content": "location_receipts_view_receipt",
+        "icon": "company"
+      }
+    }
+  },
+  "/admin/translation": {
+    "title": "translations",
+    "content": "_myorbypos_translations",
+    "icon": "IconBuilding"
+  },
+  "/admin/translation/manage": {
+    "queries": {
+      "action=create": {
+        "title": "add_translation",
+        "content": "my_salon_translations_add_translation",
+        "icon": "IconBuilding"
+      },
+      "action=view": {
+        "title": "edit_translation",
+        "content": "my_salon_translations_edit_translation",
+        "icon": "IconBuilding"
+      }
+    }
+  },
+  "/admin/orders": {
+    "title": "orders",
+    "content": "ordersservices",
+    "icon": "SupportAgentIcon"
+  }
+}

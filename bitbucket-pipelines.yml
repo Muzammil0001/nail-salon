@@ -1,0 +1,44 @@
+options:
+  max-time: 60
+  size: 2x
+
+pipelines:
+  branches:
+    master:
+      - step:
+          runs-on:
+            - self.hosted
+            - julietnails
+            - linux.shell
+            - master
+          name: Build and Deploy
+          deployment: master
+          script:
+            - export IMAGE_NAME="julietnails-master"
+            - export CONTAINER_NAME="julietnails-master"
+            - export TEMP_IMAGE_NAME="${CONTAINER_NAME}-backup"
+            - export TEMP_CONTAINER_NAME="${CONTAINER_NAME}-temp"
+            - export ENV="master"
+            - export PORT="3000"
+
+            - if docker ps -q --filter "name=$CONTAINER_NAME" | grep -q .; then
+              echo "Creating backup image and temporary container...";
+              docker commit $CONTAINER_NAME $TEMP_IMAGE_NAME:temp || true;
+              docker stop $CONTAINER_NAME || true;
+              docker run --name=$TEMP_CONTAINER_NAME --restart always -p $PORT:3000 -v /var/www:/var/www -d -t $TEMP_IMAGE_NAME:temp || true;
+              else
+              echo "Main container not running. Skipping backup.";
+              fi
+
+            - docker ps -a -q --filter "name=$CONTAINER_NAME" | grep -q . && docker rm -f $CONTAINER_NAME || echo "No old container to remove"
+
+            - docker rmi -f $IMAGE_NAME:latest || echo "No old image to remove"
+            - docker build --build-arg ENV=$ENV -t $IMAGE_NAME:latest . --progress=plain
+            - docker ps -q --filter "name=$TEMP_CONTAINER_NAME" | grep -q . && docker stop $TEMP_CONTAINER_NAME || echo "No temp container to stop"
+            - docker ps -a -q --filter "name=$TEMP_CONTAINER_NAME" | grep -q . && docker rm -f $TEMP_CONTAINER_NAME || echo "No temp container to remove"
+            - docker images -q ${TEMP_IMAGE_NAME}:temp | grep -q . && docker rmi -f ${TEMP_IMAGE_NAME}:temp || echo "No temp image to remove"
+
+            - docker run --name=$CONTAINER_NAME --restart always -p $PORT:3000 -v /var/www:/var/www --log-driver json-file --log-opt max-size=10m --log-opt max-file=3 -d -t $IMAGE_NAME:latest
+            - cp -rf public/* /var/www/public/
+            - docker system prune -a -f
+            - redis-cli -h $REDIS_HOST -p $REDIS_PORT flushdb || true

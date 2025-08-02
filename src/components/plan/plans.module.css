@@ -1,0 +1,38 @@
+.payment-label {
+	display: flex;
+	align-items: center;
+	margin-bottom: 0.5rem;
+  }
+  
+  .label-text {
+	font-weight: bold;
+	margin-right: 0.5rem;
+  }
+  .fields{
+	background-color: red
+  }
+  .card-number,
+  .expiry-date,
+  .cvv-cvc {
+	display: inline-block;
+	width: 100%;
+	height: 40px;
+	border: 1px solid #32383d;
+	border-radius: 4px;
+	padding: 8px;
+	font-family: 'latoregular';
+	font-size: 14px;
+	background-color: #F8F9FA;
+  }
+  
+  .expiry-date,
+  .cvv-cvc {
+	margin-left: 1rem;
+  }
+  
+
+
+
+.wrapper{
+	background:#28272C !important;
+}

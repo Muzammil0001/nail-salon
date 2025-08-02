@@ -1,0 +1,51 @@
+.paymentInput iframe {
+	height: 42px !important;
+	border-radius: 10px;
+	margin-bottom: 20px;
+	margin-top: 2px;
+	width: 100%;
+	box-sizing: border-box;
+	font-family: "latoregular";
+	color: #000;
+	font-size: 14px;
+	letter-spacing: 1px;
+	background: #F8F9FA;
+	text-align: left;
+	border: none;
+}
+
+.subdomain_suggestion p {
+	color: lightgrey !important;
+}
+
+.PhoneInputInput {
+	border: 0;
+	border: 1px solid #DFE5EF;
+	border-radius: 7px;
+	background: transparent;
+	height: 100%;
+	outline: 0;
+	transition: all 0.2s;
+
+}
+
+.PhoneInputInput:focus {
+	border: 2px solid #03b2cb;
+	transition: all 0.2s;
+}
+
+.custom-datetime .rdtPicker {
+	position: absolute !important;
+	top: -220px !important;
+	left: 0px !important;
+	/* Adjust this value to position the calendar above the input field */
+}
+
+.swal2-container.swal2-center.swal2-backdrop-show {
+	z-index: 9999;
+}
+
+span.MuiTypography-root.MuiTypography-body1.MuiListItemText-primary.mui-style-yn69jx-MuiTypography-root {
+	overflow: hidden;
+}
+

@@ -1,0 +1,250 @@
+import * as React from "react";
+import {
+  Box,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Toolbar,
+  TextField,
+  InputAdornment,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  TableHead,
+} from "@mui/material";
+import { IconSearch } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { useTranslation } from "react-i18next";
+import axios from "axios";
+import Loader from "../loader/Loader";
+import { ToastErrorMessage, ToastSuccessMessage } from "../common/ToastMessages";
+const SubscriptionPage = () => {
+  const [navItems, setNavItems] = useState<any[]>([]);
+  const [plans, setPlans] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const { push } = useRouter();
+  const { data: session, status }: any = useSession({
+    required: true,
+    onUnauthenticated() {
+      push("/admin/login");
+    },
+  });
+  useEffect(() => {
+    if (session && !session?.user?.roles?.includes("SuperAdmin")) {
+      push("/dashboard");
+    }
+  }, [session]);
+  const { t } = useTranslation();
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const subscription = async () => {
+    try {
+      const response = await axios.post("/api/subscription/getPlans");
+      setPlans(response.data.Subscriptions);
+    } catch (error: any) {
+      console.error(error?.response?.data?.message || error?.message);
+    }
+  };
+
+  const getNavs = async () => {
+    try {
+      const response = await axios.post(
+        "/api/navigations/getnaviagationsforsubscription"
+      );
+      setNavItems(response.data.Navigations);
+    } catch (error: any) {
+      console.error(error?.response?.data?.message || error?.message);
+    }
+  };
+
+  const setup = async () => {
+    setLoading(true);
+    await getNavs();
+    await subscription();
+    setToInsert([]);
+    setToDelete([]);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    setup();
+  }, []);
+
+  const [toInsert, setToInsert] = useState<Record<string, any>[]>([]);
+  const [toDelete, setToDelete] = useState<Record<string, any>[]>([]);
+  const handleCheckboxChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, checked } = event.target;
+    const [navId, planId] = name.split("-").map(Number);
+
+    if (session?.user.roles?.includes("SuperAdmin")) {
+      if (checked) {
+        setToInsert((prev) => [...prev, { navId, planId }]);
+        setToDelete((prev) =>
+          prev.filter(
+            (item) => !(item.navId === navId && item.planId === planId)
+          )
+        );
+      } else {
+        setToDelete((prev) => [...prev, { navId, planId }]);
+        setToInsert((prev) =>
+          prev.filter(
+            (item) => !(item.navId === navId && item.planId === planId)
+          )
+        );
+      }
+    }
+  };
+
+  const [filterednavItems, setFilterednavItems] = useState<
+    Record<string, any>[]
+  >([]);
+  const [filteredPlans, setFilteredPlans] = useState<Record<string, any>[]>([]);
+
+  useEffect(() => {
+    if (session?.user.roles?.includes("SuperAdmin")) {
+      setFilterednavItems(
+        navItems.filter((nav) =>
+          nav?.title?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    } else {
+      setFilterednavItems(
+        navItems.filter(
+          (nav) =>
+            !["admin users", "partners"].includes(nav?.title?.toLowerCase()) &&
+            nav?.title?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+    if (session?.user.roles?.includes("SuperAdmin")) {
+      setFilteredPlans(
+        plans.filter((plan) =>
+          plan?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredPlans(
+        plans.filter((plan) => plan.partner_id === session?.user.partner_id)
+      );
+    }
+  }, [navItems, session, plans]);
+
+  const updateNavigation = async () => {
+    try {
+      const response = await axios.post("/api/navigations/updatenavigation", {
+        toInsert,
+        toDelete,
+      });
+      ToastSuccessMessage(response?.data?.message || "saved!")
+      setup();
+    } catch (error: any) {
+      ToastErrorMessage(error)
+    }
+  };
+  return (
+    <div>
+      {loading ? (
+        <Loader loading={loading} />
+      ) : (
+        <>
+          <Toolbar>
+            <Box sx={{ flex: "1 1 100%" }}>
+              <TextField
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <IconSearch size="1.1rem" />
+                    </InputAdornment>
+                  ),
+                }}
+                placeholder={t("search_category") ?? ""}
+                size="small"
+                onChange={handleSearch}
+                value={searchTerm}
+                type="text"
+              />
+            </Box>
+            <Button onClick={updateNavigation} variant="contained">
+              {t("save")}
+            </Button>
+            <Button
+              onClick={setup}
+              variant="contained"
+              color="error"
+              sx={{ marginX: 1 }}
+            >
+              {t("cancel")}
+            </Button>
+          </Toolbar>
+          <Table
+            aria-label="a dense table"
+            size="small"
+            sx={{
+              width: "100%",
+            }}
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell>{t("navigation")}</TableCell>
+                {filteredPlans.map((plan) => (
+                  <TableCell key={plan.id}>{plan.name}</TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filterednavItems.map((nav) => (
+                <TableRow key={nav.id}>
+                  <TableCell>
+                    {t(
+                      nav.title
+                        .toLowerCase()
+                        .replace(/ /g, "_")
+                        .replace(/[^\w\s]/g, "")
+                    )}
+                  </TableCell>
+                  {filteredPlans.map((plan) => (
+                    <TableCell key={plan.id}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={
+                              (nav.subscription_navigation.filter(
+                                (x: Record<string, any>) =>
+                                  x.subscription_id === plan.id
+                              ).length > 0 &&
+                                toDelete?.filter(
+                                  (x) =>
+                                    x.planId === plan.id && x.navId === nav.id
+                                ).length === 0) ||
+                              toInsert?.filter(
+                                (x) =>
+                                  x.planId === plan.id && x.navId === nav.id
+                              ).length > 0
+                            }
+                            onChange={handleCheckboxChange}
+                            name={`${nav.id}-${plan.id}`}
+                          />
+                        }
+                        label={undefined}
+                      />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </>
+      )}
+    </div>
+  );
+};
+
+export default SubscriptionPage;

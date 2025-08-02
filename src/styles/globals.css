@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Fira+Code:wght@300..700&family=Great+Vibes&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary Colors */
+  --primary-main: #6E082F;  /* Replaced primary main color with #6E082F */
+  --primary-light: #FDFBFF; /* Replaced primary light color with #FDFBFF */
+  --primary-dark: #110219;  /* Replaced primary dark color with #110219 */
+  --primary-contrastText: #ffffff;
+
+  /* Secondary Colors (Optional, based on your design, you can define them) */
+  --secondary-main: #47d7bc;
+  --secondary-light: #edfbf7;
+  --secondary-dark: #39c7ad;
+  --secondary-contrastText: #ffffff;
+
+  /* Success Colors */
+  --success-main: #13deb9;
+  --success-light: #e6fffa;
+  --success-dark: #02b3a9;
+  --success-contrastText: #ffffff;
+
+  /* Info Colors */
+  --info-main: #539bff;
+  --info-light: #ebf3fe;
+  --info-dark: #1682d4;
+  --info-contrastText: #ffffff;
+
+  /* Error Colors */
+  --error-main: #fa896b;
+  --error-light: #fdede8;
+  --error-dark: #f3704d;
+  --error-contrastText: #ffffff;
+
+  /* Warning Colors */
+  --warning-main: #ffae1f;
+  --warning-light: #fef5e5;
+  --warning-dark: #ae8e59;
+  --warning-contrastText: #ffffff;
+
+  /* Purple Colors */
+  --purple-A50: #ebf3fe;
+  --purple-A100: #6610f2;
+  --purple-A200: #557fb9;
+
+  /* Grey Colors */
+  --grey-50: #fafafa;
+  --grey-100: #f2f6fa;
+  --grey-200: #eaeff4;
+  --grey-300: #dfe5ef;
+  --grey-400: #7c8fac;
+  --grey-500: #5a6a85;
+  --grey-600: #2a3547;
+  --grey-700: #616161;
+  --grey-800: #424242;
+  --grey-900: #212121;
+  --grey-A100: #f5f5f5;
+  --grey-A200: #eeeeee;
+  --grey-A400: #bdbdbd;
+  --grey-A700: #616161;
+
+  /* Text Colors */
+  --text-primary: #2a3547;
+  --text-secondary: #2a3547;
+  --text-disabled: rgba(0, 0, 0, 0.38);
+
+  /* Action Colors */
+  --action-disabledBackground: rgba(73, 82, 88, 0.12);
+  --action-hover: #f6f9fc;
+  --action-active: rgba(0, 0, 0, 0.54);
+  --action-selected: rgba(0, 0, 0, 0.08);
+  --action-disabled: rgba(0, 0, 0, 0.26);
+
+  /* Divider */
+  --divider: #e5eaef;
+
+  /* Common Colors */
+  --common-black: #000;
+  --common-white: #fff;
+
+  /* Background */
+  --background-paper: #fff;
+  --background-default: #fff;
+}
+
+@font-face {
+  font-family: "playfair_displayregular";
+  src: url("../../public/fonts/playfairdisplay-regular-webfont.woff2")
+      format("woff2"),
+    url("../../public/fonts/playfairdisplay-regular-webfont.woff")
+      format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "latoregular";
+  src: url("../../public/fonts/lato-regular-webfont.woff2") format("woff2"),
+    url("../../public/fonts/lato-regular-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.pac-container {
+  z-index: 9999 !important;
+}
+
+.validationError {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.66;
+  text-align: left;
+  margin-top: 3px;
+  margin-right: 14px;
+  margin-bottom: 0;
+  margin-left: 0px;
+  color: #fa896b;
+}
+
+.previewTitle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  padding: 20px;
+  color: #000;
+}
+
+.previewTitle p,
+.previewTitle span {
+  font-family: "latoregular";
+  color: #292d32;
+}
+
+.rdrDateDisplayWrapper {
+  display: none !important;
+}
+
+/* .mui-style-5ad73w-MuiPaper-root-MuiDialog-paper {
+      max-width: none;
+      width: 709px !important;
+  }
+  
+  */
+.datePickerDialog {
+  max-width: none !important;
+  width: 709px !important;
+}
+
+.buttonGrey {
+  color: grey;
+  border-color: #dee1e5;
+  width: 100%;
+}
+
+.buttonGrey:hover {
+  background-color: white;
+  color: grey;
+  border-color: #dee1e5;
+}
+
+.clearButton:hover {
+  background-color: #eff9ff;
+  color: #2276ff;
+}
+
+span.rdrStartEdge.rdrEndEdge {
+  color: #2276ff !important;
+}
+
+.previewTitle h1 {
+  margin-top: 0;
+  font-size: 55px;
+  line-height: 70px;
+  text-transform: capitalize;
+  color: #000000;
+  margin-bottom: 20px;
+  font-family: "playfair_displayregular";
+  font-style: normal;
+  font-weight: 700;
+}
+
+@media screen and (max-width: 768px) {
+  .previewTitle {
+    position: static;
+    height: auto;
+    max-width: 100%;
+    margin-top: 35px;
+    padding: 0;
+    text-align: center;
+  }
+
+  .previewTitle h1 {
+    font-size: 45px;
+    line-height: 50px;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FDFBFF;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6E082F;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #110219;
+}
+
+.PhoneInputCountry {
+  border: 1px solid #dfe5ef;
+  padding: 4px 8px;
+  border-radius: 5px;
+  border-right: 0;
+}
+
+.PhoneInputInput {
+  padding-left: 10px;
+}
+
+.MuiTableCell-root {
+  box-shadow: rgba(0, 0, 0, 0.15) 2.95px 0px 2px;
+}

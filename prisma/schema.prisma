@@ -1,0 +1,948 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id                         String                     @id @default(uuid())
+  email                      String
+  username                   String                     @unique @default(uuid())
+  password                   String?                    @db.VarChar(255)
+  country                    String?
+  street                     String?
+  city                       String?
+  postcode                   String?
+  state                      String?
+  pin                        String?
+  image                      String?
+  location_id                String?
+  client_id                  String?
+  billing_model              String?
+  next_payment_on            DateTime?
+  subscription_id            String?
+  personal_identification_no String?
+  shopper_reference          String?                    @unique
+  created_at                 DateTime                   @default(now())
+  updated_at                 DateTime                   @updatedAt
+  phone                      String                     @default("")
+  display_color              String                     @default("#fff")
+  deleted_status             Boolean                    @default(false)
+  active_status              Boolean                    @default(true)
+  user_main                  Boolean?                   @default(false)
+  password_changed           Boolean                    @default(false)
+  first_name                 String
+  last_name                  String
+  fcm_token                  String?
+  last_login                 DateTime?
+  client_language_id         String?
+  accessrights               accessrights?
+  subscription               subscriptions?             @relation(fields: [subscription_id], references: [id])
+  location                   location?                  @relation(fields: [location_id], references: [id])
+  client_languages           client_languages[]
+  categories                 categories[]
+  services                   services[]
+  reservations               reservations[]
+  activity_logs              activity_logs[]
+  transaction_details        transaction_details[]
+  otp_code                   String?
+  otp_expired_at             DateTime?
+  user_translation_language  user_translation_language?
+  user_to_role               user_to_role[]
+  selected_location          selected_location?
+  staff_accessrights         staff_accessrights?
+  user_schedule              user_schedule[]
+
+  user_clock_in          user_clock_in[]
+  staff_tip              staff_tip[]
+  staff_service_rotation staff_service_rotation?
+  payroll                payroll?
+  payroll_payment        payroll_payment[]
+
+  created_gift_cards        gift_card[]                 @relation("GiftCardCreatedBy")
+  gift_card_transactions    gift_card_transaction[]     @relation("GiftCardTransactionCreatedBy")
+  order_transaction_details order_transaction_details[]
+  orderUserOrders           orders[]                    @relation("OrderUser")
+  orderStaffOrders          orders[]                    @relation("OrderStaff")
+  active_service_session    active_service_session[]
+}
+
+model loyalty {
+  id              String   @id @default(uuid())
+  location_id     String   @unique
+  earn_amount     Float
+  earn_points     Float
+  redeem_points   Float
+  redeem_amount   Float
+  max_redeem_pct  Float
+  expires_in_days Int?
+  deleted_status  Boolean  @default(false)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  location location @relation(fields: [location_id], references: [id])
+}
+
+model user_loyalty {
+  id         String   @id @default(uuid())
+  user_id    String   @unique
+  points     Float    @default(0)
+  updated_at DateTime @updatedAt
+
+  reservation_customer reservation_customer @relation(fields: [user_id], references: [id])
+}
+
+model loyalty_history {
+  id               String      @id @default(uuid())
+  user_id          String
+  reservation_id   String?
+  type             LoyaltyType
+  points           Float
+  amount           Float
+  location_id      String
+  expires_at       DateTime?
+  remaining_points Float?
+  earned_from_id   String?
+  created_at       DateTime    @default(now())
+
+  reservation_customer reservation_customer @relation(fields: [user_id], references: [id])
+  reservation          reservations?        @relation(fields: [reservation_id], references: [id])
+  location             location             @relation(fields: [location_id], references: [id])
+
+  earnedFrom    loyalty_history?  @relation("RedeemSource", fields: [earned_from_id], references: [id])
+  usedInRedeems loyalty_history[] @relation("RedeemSource")
+}
+
+model payroll {
+  id            String   @id @default(uuid())
+  user_id       String   @unique
+  salary        Float    @default(0)
+  commission    Float?   @default(0)
+  hours         Float    @default(0)
+  total         Float?   @default(0)
+  tip_deduction Float    @default(0)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  user            user              @relation(fields: [user_id], references: [id])
+  payroll_payment payroll_payment[]
+}
+
+model payroll_payment {
+  id               String   @id @default(uuid())
+  user_id          String
+  payroll_id       String
+  pay_period_start DateTime
+  pay_period_end   DateTime
+  per_hour_salary  Float    @default(0)
+  commission       Float?   @default(0)
+  worked_hours     Float    @default(0)
+  tip_deduction    Float    @default(0)
+  gross_salary     Float    @default(0)
+  net_salary       Float    @default(0)
+  total_tip        Float    @default(0)
+  paid_at          DateTime @default(now())
+
+  user    user    @relation(fields: [user_id], references: [id])
+  payroll payroll @relation(fields: [payroll_id], references: [id])
+}
+
+model user_schedule {
+  id               String          @id @default(uuid())
+  user_id          String
+  schedule_day     String
+  schedule_enabled Boolean         @default(true)
+  schedule_from    DateTime        @default(dbgenerated("'00:00:00'::time without time zone")) @db.Time(6)
+  schedule_to      DateTime        @default(dbgenerated("'00:00:00'::time without time zone")) @db.Time(6)
+  user             user            @relation(fields: [user_id], references: [id])
+  user_clock_in    user_clock_in[]
+}
+
+model user_clock_in {
+  id            String          @id @default(uuid())
+  user_id       String
+  user          user            @relation(fields: [user_id], references: [id])
+  clock_in      DateTime        @default(now())
+  clock_out     DateTime?
+  date          DateTime        @default(now())
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  user_schedule user_schedule[]
+}
+
+model staff_tip {
+  id                 String    @id @default(uuid())
+  user_id            String?
+  reservation_id     String    @unique
+  tip                Float     @default(0)
+  tip_type           tip_type  @default(CASH)
+  cash_amount        Float?    @default(0)
+  check_amount       Float?    @default(0)
+  check_paid_amount  Float     @default(0)
+  check_fully_paid   Boolean   @default(false)
+  check_last_paid_at DateTime?
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  reservation reservations @relation(fields: [reservation_id], references: [id])
+  staff       user?        @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, reservation_id])
+}
+
+model staff_service_rotation {
+  id         String   @id @default(uuid())
+  user_id    String   @unique
+  points     Float    @default(0)
+  createdAt  DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user user @relation(fields: [user_id], references: [id])
+}
+
+model reservation_rotation_threshold {
+  id                    String   @id @default(uuid())
+  location_id           String   @unique
+  reservation_threshold Float    @default(50)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  location location @relation(fields: [location_id], references: [id])
+}
+
+model location {
+  id                    String   @id @default(uuid())
+  client_id             String   @unique
+  location_currency     String   @default("USD")
+  location_name         String
+  location_timezone     String   @default("America/New_York")
+  location_24_hours     Boolean  @default(false)
+  location_number       String   @unique
+  language_id           String?
+  country               String
+  street                String
+  city                  String
+  postcode              String
+  state                 String?
+  latitude              String?
+  longitude             String?
+  send_activation_email Boolean  @default(true)
+  location_email        String
+  location_phone        String
+  tip_enabled           Boolean  @default(false)
+  deleted_status        Boolean  @default(false)
+  active_status         Boolean  @default(true)
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+
+  device              device[]
+  categories          categories[]
+  services            services[]
+  location_schedule   location_schedule[]
+  reservations        reservations[]
+  activity_logs       activity_logs[]
+  languages           languages?            @relation(fields: [languagesId], references: [id])
+  languagesId         String?
+  location_language   location_language[]
+  selected_location   selected_location[]
+  user                user[]
+  reservation_details reservation_details[]
+
+  reservation_rotation_threshold reservation_rotation_threshold?
+
+  loyalty                loyalty?
+  loyalty_history        loyalty_history[]
+  gift_cards             gift_card[]
+  orders                 orders[]
+  order_details          order_details[]
+  active_service_session active_service_session[]
+}
+
+model selected_location {
+  id          String    @id @default(uuid())
+  user_id     String    @unique
+  location_id String
+  user        user      @relation(fields: [user_id], references: [id])
+  location    location? @relation(fields: [location_id], references: [id])
+}
+
+model activity_logs {
+  id           String       @id @default(uuid())
+  location_id  String?
+  message      String
+  message_type message_type @default(info)
+  user_id      String?
+  user_agent   String?
+  created_at   DateTime     @default(now())
+  user         user?        @relation(fields: [user_id], references: [id])
+  location     location?    @relation(fields: [location_id], references: [id])
+}
+
+model staff_accessrights {
+  id                     String  @id @default(uuid())
+  user_id                String  @unique
+  can_take_cash          Boolean @default(false)
+  can_take_card          Boolean @default(false)
+  can_make_reservation   Boolean @default(false)
+  can_edit_reservation   Boolean @default(false)
+  can_cancel_reservation Boolean @default(false)
+  can_view_sales         Boolean @default(false)
+  can_view_customers     Boolean @default(false)
+  can_manage_profile     Boolean @default(false)
+  can_view_activity_logs Boolean @default(false)
+  can_view_settings      Boolean @default(false)
+
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model user_to_role {
+  id      String @id @default(uuid())
+  user_id String
+  role_id String
+  user    user   @relation(fields: [user_id], references: [id])
+  role    role   @relation(fields: [role_id], references: [id])
+}
+
+model location_schedule {
+  id            String   @id @default(uuid())
+  location_id   String
+  schedule_day  String
+  active_status Boolean  @default(true)
+  schedule_from DateTime @default(dbgenerated("'00:00:00'::time without time zone")) @db.Time(6)
+  schedule_to   DateTime @default(dbgenerated("'00:00:00'::time without time zone")) @db.Time(6)
+  location      location @relation(fields: [location_id], references: [id])
+}
+
+model device {
+  id                      String         @id @default(uuid())
+  device_name             String
+  device_id               String         @unique
+  active_status           Boolean        @default(true)
+  location_id             String
+  deleted_status          Boolean        @default(false)
+  client_language_id      String?
+  reservation_customer_id String?
+  location                location       @relation(fields: [location_id], references: [id])
+  reservations            reservations[]
+  customers               customers?     @relation(fields: [customersId], references: [id])
+  customersId             String?
+
+  reservation_customer reservation_customer?
+  order_customer       order_customer?
+}
+
+model role {
+  id              String            @id @default(uuid())
+  name            String            @unique
+  description     String
+  role_navigation role_navigation[]
+  user_to_role    user_to_role[]
+}
+
+model subscriptions {
+  id                      String                    @id @default(uuid())
+  name                    String
+  description             String
+  created_at              DateTime                  @default(now())
+  updated_at              DateTime                  @updatedAt
+  deleted_at              DateTime?
+  active_status           Boolean                   @default(true)
+  deleted_status          Boolean                   @default(false)
+  price                   Float
+  yearly_price            Float
+  max_devices             Int                       @default(0)
+  max_locations           Int                       @default(0)
+  subscription_feature    subscription_features[]
+  subscription_navigation subscription_navigation[]
+  user                    user[]
+}
+
+model accessrights {
+  id       String @id @default(uuid())
+  user_id  String @unique
+  user     user   @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  controls Json
+}
+
+model navigation {
+  id                      String                    @id @default(uuid())
+  title                   String                    @unique
+  href                    String
+  role_navigation         role_navigation[]
+  subscription_navigation subscription_navigation[]
+}
+
+model role_navigation {
+  id            String     @id @default(uuid())
+  navigation_id String
+  role_id       String
+  navigation    navigation @relation(fields: [navigation_id], references: [id])
+  role          role       @relation(fields: [role_id], references: [id])
+
+  @@unique([role_id, navigation_id])
+}
+
+model subscription_navigation {
+  id              String        @id @default(uuid())
+  navigation_id   String
+  subscription_id String
+  navigation      navigation    @relation(fields: [navigation_id], references: [id])
+  subscription    subscriptions @relation(fields: [subscription_id], references: [id])
+
+  @@unique([subscription_id, navigation_id], name: "userRoleSubscriptionPlanNavigationItem_unique")
+}
+
+model registration_otp {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  code       String
+  expires_at DateTime
+  created_at DateTime @default(now())
+  used       Boolean  @default(false)
+}
+
+model configuration {
+  id             String   @id @default(uuid())
+  key            String   @unique
+  value          String
+  description    String?
+  is_visible     Boolean  @default(true)
+  is_editable    Boolean  @default(true)
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+  createdBy      String
+  deleted_status Boolean  @default(false)
+}
+
+model languages {
+  id                   String                 @id @default(uuid())
+  language_name        String                 @default("")
+  language_code        String                 @unique
+  deleted_status       Boolean                @default(false)
+  client_languages     client_languages[]
+  location_languages   location_language[]
+  locations            location[]
+  translation_language translation_language[]
+}
+
+model location_language {
+  id          String    @id @default(uuid())
+  language_id String
+  location_id String
+  languages   languages @relation(fields: [language_id], references: [id])
+  location    location  @relation(fields: [location_id], references: [id])
+}
+
+model client_languages {
+  id             String    @id @default(uuid())
+  deleted_status Boolean   @default(false)
+  active_status  Boolean   @default(true)
+  language_id    String
+  location_id    String?
+  client_id      String
+  languages      languages @relation(fields: [language_id], references: [id])
+  client         user      @relation(fields: [client_id], references: [id])
+  created_at     DateTime  @default(now())
+  updated_at     DateTime  @updatedAt
+}
+
+model categories {
+  id             String     @id @default(uuid())
+  name           String     @unique
+  deleted_status Boolean    @default(false)
+  active_status  Boolean    @default(false)
+  location_id    String
+  image          String     @default("")
+  description    String     @default("")
+  client_id      String
+  created_at     DateTime   @default(now())
+  updated_at     DateTime   @updatedAt
+  sort_order     Int        @default(0)
+  client         user       @relation(fields: [client_id], references: [id])
+  location       location   @relation(fields: [location_id], references: [id])
+  services       services[]
+}
+
+model services {
+  id                  String                @id @default(uuid())
+  name                String
+  price               Float                 @default(0)
+  material_cost       Float?
+  description         String                @default("")
+  category_id         String
+  duration_minutes    Int                   @default(0)
+  deleted_status      Boolean               @default(false)
+  active_status       Boolean               @default(true)
+  location_id         String
+  client_id           String
+  sort_order          Int                   @default(0)
+  created_at          DateTime              @default(now())
+  updated_at          DateTime              @updatedAt
+  client              user                  @relation(fields: [client_id], references: [id])
+  location            location              @relation(fields: [location_id], references: [id])
+  categories          categories            @relation(fields: [category_id], references: [id])
+  reservation_details reservation_details[]
+}
+
+model reservation_customer {
+  id              String   @id @default(uuid())
+  email           String
+  first_name      String
+  last_name       String?
+  phone           String
+  alternate_phone String?
+  is_verified     Boolean  @default(true)
+  device_id       String?  @unique
+  deleted_status  Boolean  @default(false)
+  active_status   Boolean  @default(true)
+  fcm_token       String?  @default("")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  reservations reservations[]
+  device       device?        @relation(fields: [device_id], references: [id])
+
+  user_loyalty    user_loyalty?
+  loyalty_history loyalty_history[]
+}
+
+model customers {
+  id              String   @id @default(uuid())
+  firstname       String
+  lastname        String
+  email           String
+  username        String
+  phone           String
+  alternate_phone String?
+  password        String
+  is_verified     Boolean  @default(false)
+  deleted_status  Boolean  @default(false)
+  active_status   Boolean  @default(true)
+  fcm_token       String?  @default("")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  image           String?
+
+  devices                   device[]
+  forgot_passwords          customer_forgot_password[]
+  activitylogs              customer_activity_logs[]
+  order_transaction_details order_transaction_details[]
+
+  @@index([email, deleted_status])
+  @@index([username, deleted_status])
+}
+
+model customer_forgot_password {
+  id          String   @id @default(uuid())
+  customer_id String
+  otp         String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  customer customers @relation(fields: [customer_id], references: [id], onDelete: Cascade)
+
+  @@index([customer_id])
+}
+
+model customer_activity_logs {
+  id          String   @id @default(uuid())
+  customer_id String
+  action      String
+  details     String?
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  customer customers @relation(fields: [customer_id], references: [id])
+}
+
+model reservations {
+  id                      String             @id @default(uuid())
+  reservation_number      Int
+  staff_id                String?
+  price_total             Float
+  verified                Boolean            @default(true)
+  deleted_status          Boolean            @default(false)
+  reservation_status      reservation_status @default(PENDING)
+  location_id             String
+  created_at              DateTime           @default(now())
+  updated_at              DateTime           @updatedAt
+  reservation_customer_id String
+  schedule_start_time     DateTime
+  schedule_end_time       DateTime
+  reservation_date        DateTime           @default(now())
+
+  staff                user?                @relation(fields: [staff_id], references: [id])
+  location             location             @relation(fields: [location_id], references: [id])
+  reservation_customer reservation_customer @relation(fields: [reservation_customer_id], references: [id])
+  device_id            String?
+  device               device?              @relation(fields: [device_id], references: [id])
+
+  reservation_details     reservation_details[]
+  reservation_transaction reservation_transaction?
+  staff_tip               staff_tip?
+
+  loyalty_history        loyalty_history[]
+  gift_card_transactions gift_card_transaction[]
+  active_service_session active_service_session[]
+}
+
+model reservation_details {
+  id             String   @id @default(uuid())
+  reservation_id String
+  service_id     String
+  service_name   String
+  service_price  Float
+  quantity       Int      @default(1)
+  location_id    String
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  reservations reservations @relation(fields: [reservation_id], references: [id])
+  location     location     @relation(fields: [location_id], references: [id])
+  service      services     @relation(fields: [service_id], references: [id])
+}
+
+model reservation_transaction {
+  id                    String           @id @default(uuid())
+  invoice_number        String?          @unique
+  reservation_id        String           @unique
+  type                  transaction_type @default(CASH)
+  payment_status        payment_status   @default(PENDING)
+  amount                Float
+  reservation_tip       Float            @default(0)
+  transaction_detail_id String?          @unique
+  created_at            DateTime         @default(now())
+
+  reservation        reservations         @relation(fields: [reservation_id], references: [id])
+  transaction_detail transaction_details? @relation("TransactionDetail", fields: [transaction_detail_id], references: [id])
+}
+
+model transaction_details {
+  id                       String   @id @default(uuid())
+  client_id                String?
+  value                    Decimal?
+  currency                 String
+  success                  Boolean
+  payment_method           String
+  card_summary             String?
+  card_holder_name         String?
+  card_bin                 String?
+  stripe_payment_intent_id String?
+  stripe_charge_id         String?
+  stripe_customer_id       String?
+  stripe_invoice_id        String?
+  stripe_status            String?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+
+  client                  user?                    @relation(fields: [client_id], references: [id])
+  reservation_transaction reservation_transaction? @relation("TransactionDetail")
+}
+
+model app_names {
+  id           String        @id @default(uuid())
+  app_name     String?       @unique
+  app_versions app_version[]
+}
+
+model app_version {
+  id                       String     @id @default(uuid())
+  app_id                   String?
+  app_platform             String     @default("")
+  app_version_number       String?    @default("")
+  app_version_build_number String?    @default("")
+  app_version_datetime     DateTime?  @default(now())
+  app_version_optional     Boolean?   @default(true)
+  app_version_live         Boolean?   @default(false)
+  deleted_status           Boolean?   @default(false)
+  app_name                 app_names? @relation(fields: [app_id], references: [id])
+}
+
+model translation_language {
+  id                        String                      @id @default(uuid())
+  language_id               String
+  deleted_status            Boolean                     @default(false)
+  active_status             Boolean                     @default(true)
+  language                  languages                   @relation(fields: [language_id], references: [id])
+  user_translation_language user_translation_language[]
+  translation_page          translation_page[]
+}
+
+model user_translation_language {
+  id                      String               @id @default(uuid())
+  user_id                 String               @unique
+  translation_language_id String
+  translation_language    translation_language @relation(fields: [translation_language_id], references: [id])
+  user                    user                 @relation(fields: [user_id], references: [id])
+}
+
+model translation_page {
+  id                      String                  @id @default(uuid())
+  page_name               String
+  translation_language_id String
+  translation_language    translation_language    @relation(fields: [translation_language_id], references: [id])
+  translation_page_text   translation_page_text[]
+}
+
+model translation_page_text {
+  id                  String           @id @default(uuid())
+  translation_page_id String
+  text                String
+  translation         String?
+  translation_page    translation_page @relation(fields: [translation_page_id], references: [id])
+}
+
+model features {
+  id                   String                  @id @default(uuid())
+  name                 String
+  code                 String                  @unique
+  subscription_feature subscription_features[]
+}
+
+model subscription_features {
+  id              String        @id @default(uuid())
+  feature_id      String
+  subscription_id String
+  feature         features      @relation(fields: [feature_id], references: [id])
+  subscription    subscriptions @relation(fields: [subscription_id], references: [id])
+}
+
+model gift_card {
+  id              String    @id @default(uuid())
+  card_code       String    @unique
+  name            String
+  description     String?
+  amount          Float
+  balance         Float     @default(0)
+  number_of_times Int       @default(1)
+  times_used      Int       @default(0)
+  is_percentage   Boolean   @default(false)
+  expiry_date     DateTime?
+  location_id     String
+  created_by      String
+  active_status   Boolean   @default(true)
+  deleted_status  Boolean   @default(false)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+
+  location               location                @relation(fields: [location_id], references: [id])
+  created_by_user        user                    @relation("GiftCardCreatedBy", fields: [created_by], references: [id])
+  gift_card_transactions gift_card_transaction[]
+}
+
+model gift_card_transaction {
+  id                String                     @id @default(uuid())
+  gift_card_id      String
+  transaction_type  gift_card_transaction_type
+  amount            Float
+  balance_before    Float
+  balance_after     Float
+  times_used_before Int
+  times_used_after  Int
+  reservation_id    String?
+  created_by        String
+  created_at        DateTime                   @default(now())
+
+  gift_card       gift_card     @relation(fields: [gift_card_id], references: [id])
+  created_by_user user          @relation("GiftCardTransactionCreatedBy", fields: [created_by], references: [id])
+  reservations    reservations? @relation(fields: [reservation_id], references: [id])
+}
+
+model orders {
+  id             String           @id @default(uuid())
+  order_number   Int              @unique
+  customer_id    String?
+  user_id        String?
+  staff_id       String?
+  location_id    String
+  tip            Float?
+  discount       Float?
+  total_price    Float
+  order_by       String?          @default("")
+  order_status   order_status     @default(PENDING)
+  payment_method transaction_type @default(CASH)
+  payment_status payment_status   @default(PENDING)
+  is_customer    Boolean          @default(true)
+  deleted_status Boolean          @default(false)
+  verified       Boolean          @default(true)
+  created_at     DateTime         @default(now())
+  updated_at     DateTime         @updatedAt
+
+  user     user?    @relation("OrderUser", fields: [user_id], references: [id])
+  staff    user?    @relation("OrderStaff", fields: [staff_id], references: [id])
+  location location @relation(fields: [location_id], references: [id])
+
+  order_details          order_details[]
+  order_transaction      order_transaction?
+  extra_charges          extra_charge[]
+  active_service_session active_service_session[]
+  customers              order_customer?          @relation(fields: [customer_id], references: [id])
+
+  @@index([customer_id])
+  @@index([user_id])
+  @@index([order_status])
+}
+
+model order_customer {
+  id              String   @id @default(uuid())
+  email           String
+  first_name      String
+  last_name       String?
+  phone           String
+  alternate_phone String?
+  is_verified     Boolean  @default(true)
+  device_id       String?  @unique
+  deleted_status  Boolean  @default(false)
+  active_status   Boolean  @default(true)
+  fcm_token       String?  @default("")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  orders orders[]
+  device device?  @relation(fields: [device_id], references: [id])
+}
+
+model extra_charge {
+  id       String @id @default(uuid())
+  order_id String
+  name     String
+  amount   Float
+
+  order orders @relation(fields: [order_id], references: [id])
+
+  @@index([order_id])
+}
+
+model order_details {
+  id          String   @id @default(uuid())
+  order_id    String
+  item_id     String
+  item_name   String
+  item_price  Float
+  quantity    Int      @default(1)
+  location_id String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  orders   orders   @relation(fields: [order_id], references: [id])
+  location location @relation(fields: [location_id], references: [id])
+}
+
+model order_transaction {
+  id                    String           @id @default(uuid())
+  order_id              String           @unique
+  invoice_number        String?          @unique
+  type                  transaction_type @default(CASH)
+  payment_status        payment_status   @default(PENDING)
+  amount                Float
+  transaction_detail_id String?          @unique
+  created_at            DateTime         @default(now())
+  updated_at            DateTime         @updatedAt
+
+  order              orders                     @relation(fields: [order_id], references: [id])
+  transaction_detail order_transaction_details? @relation("OrderTransactionDetail", fields: [transaction_detail_id], references: [id])
+}
+
+model order_transaction_details {
+  id                       String   @id @default(uuid())
+  customer_id              String?
+  user_id                  String?
+  value                    Decimal?
+  currency                 String
+  success                  Boolean
+  payment_method           String
+  card_summary             String?
+  card_holder_name         String?
+  card_bin                 String?
+  stripe_payment_intent_id String?
+  stripe_charge_id         String?
+  stripe_customer_id       String?
+  stripe_invoice_id        String?
+  stripe_status            String?
+  created_at               DateTime @default(now())
+  updated_at               DateTime @updatedAt
+
+  customers         customers?         @relation(fields: [customer_id], references: [id])
+  user              user?              @relation(fields: [user_id], references: [id])
+  order_transaction order_transaction? @relation("OrderTransactionDetail")
+}
+
+model active_service_session {
+  id             String    @id @default(uuid())
+  staff_id       String
+  location_id    String
+  reservation_id String?
+  order_id       String?
+  started_at     DateTime  @default(now())
+  ended_at       DateTime?
+
+  staff       user          @relation(fields: [staff_id], references: [id])
+  location    location      @relation(fields: [location_id], references: [id])
+  reservation reservations? @relation(fields: [reservation_id], references: [id])
+  order       orders?       @relation(fields: [order_id], references: [id])
+
+  @@index([staff_id])
+  @@index([location_id])
+}
+
+enum message_type {
+  success
+  info
+  error
+  warn
+}
+
+enum payment_status {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum order_status {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+enum billing_model {
+  UNLIMITED
+  MONTHLY
+  YEARLY
+}
+
+enum reservation_status {
+  PENDING
+  INCOMPLETE
+  COMPLETED
+  CANCELED
+}
+
+enum transaction_type {
+  CARD
+  CASH
+  QR
+}
+
+enum tip_type {
+  CASH
+  CHECK
+  SPLIT
+}
+
+enum LoyaltyType {
+  EARNED
+  REDEEMED
+}
+
+enum gift_card_transaction_type {
+  PURCHASE
+  REDEMPTION
+  REFUND
+  ADJUSTMENT
+}
